@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Érase una vez… ¡la música! - Cuestionario de Historia de la Música (6.º de Primaria)</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <!-- Google Fonts: Fredoka & Nunito -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #fef3c7 0%, #e0f2fe 50%, #e0e7ff 100%);
+            min-height: 100vh;
+            user-select: none;
+        }
+
+        h1, h2, h3, h4, .font-heading {
+            font-family: 'Fredoka', cursive, sans-serif;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 2px solid rgba(255, 255, 255, 0.85);
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Pulse Ring for Prep Timer */
+        @keyframes ringPulse {
+            0%, 100% { transform: scale(1); opacity: 0.9; }
+            50% { transform: scale(1.03); opacity: 1; }
+        }
+        .animate-ring-pulse {
+            animation: ringPulse 1s infinite ease-in-out;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(241, 245, 249, 0.6);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+    </style>
+</head>
+<body class="text-slate-900 pb-8 flex flex-col min-h-screen">
+
+    <!-- GLOBAL HEADER -->
+    <header class="bg-white/95 backdrop-blur-md border-b-4 border-indigo-600 shadow-md sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-4 py-2.5 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-3">
+            
+            <div class="flex items-center space-x-3 text-center md:text-left">
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-2xl shadow-md flex-shrink-0">
+                    <i class="fa-solid fa-compact-disc animate-spin-slow"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl sm:text-2xl font-black text-indigo-950 leading-tight">
+                        Érase una vez… ¡la música!
+                    </h1>
+                    <p class="text-xs sm:text-sm font-extrabold text-indigo-600">
+                        Cuestionario de Historia de la Música (6.º de Primaria)
+                    </p>
+                </div>
+            </div>
+
+            <!-- Header Controls -->
+            <div class="flex items-center gap-2 sm:gap-3 flex-wrap justify-center">
+                <button onclick="toggleAudio()" id="audioToggleBtn" title="Activar/Desactivar Sonido" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 border-2 border-slate-300 font-extrabold text-slate-700 flex items-center gap-2 transition active:scale-95 text-sm sm:text-base">
+                    <i id="audioIcon" class="fa-solid fa-volume-high text-indigo-600"></i>
+                    <span id="audioText" class="hidden sm:inline">Sonido: ON</span>
+                </button>
+
+                <button onclick="togglePauseTimer()" id="pauseTimerBtn" class="px-3.5 py-1.5 rounded-xl bg-indigo-100 hover:bg-indigo-200 border-2 border-indigo-300 text-indigo-950 font-extrabold flex items-center gap-2 transition active:scale-95 text-sm sm:text-base">
+                    <i id="pauseIcon" class="fa-solid fa-pause text-indigo-700"></i>
+                    <span id="pauseText">Pausar</span>
+                </button>
+
+                <button onclick="openPodiumModal()" class="px-4 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-500 border-b-4 border-amber-600 text-amber-950 font-black shadow-md flex items-center gap-2 transition active:scale-95 text-sm sm:text-base">
+                    <i class="fa-solid fa-trophy text-amber-900"></i>
+                    <span>Ver Podio</span>
+                </button>
+
+                <button onclick="resetGame()" class="px-4 py-1.5 rounded-xl bg-rose-500 hover:bg-rose-600 border-b-4 border-rose-700 text-white font-black shadow-md flex items-center gap-2 transition active:scale-95 text-sm sm:text-base">
+                    <i class="fa-solid fa-rotate-right"></i>
+                    <span class="hidden sm:inline">Reiniciar Juego</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN APP CONTAINER -->
+    <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 flex-1 w-full flex flex-col gap-4">
+
+        <!-- SCOREBOARD FOR 6 TEAMS (ALWAYS VISIBLE AT TOP) -->
+        <section class="glass-card rounded-3xl p-3 sm:p-4 border-indigo-200 shadow-xl">
+            <div class="flex items-center justify-between mb-2 border-b border-slate-200 pb-2">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-users text-indigo-600 text-xl"></i>
+                    <h2 class="text-lg sm:text-xl font-black text-slate-800">Marcador de los 6 Equipos</h2>
+                </div>
+                <span class="text-xs font-bold text-slate-500 bg-indigo-50 px-2.5 py-1 rounded-full border border-indigo-200">
+                    ✏️ Toca el nombre de un equipo para editarlo
+                </span>
+            </div>
+
+            <!-- Grid of 6 Team Cards -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3" id="scoreboardGrid">
+                <!-- Dynamically Rendered -->
+            </div>
+        </section>
+
+        <!-- ACTIVE QUESTION CARD SECTION (STARTS DIRECTLY ON PREGUNTA 1) -->
+        <section class="glass-card rounded-3xl p-4 sm:p-6 md:p-8 border-sky-300 shadow-2xl flex-1 flex flex-col justify-between gap-5">
+            
+            <!-- Question Category, Progress & Navigation Header -->
+            <div class="flex flex-wrap items-center justify-between gap-3 border-b-2 border-slate-200 pb-3">
+                <div class="flex items-center gap-3">
+                    <span id="qCategoryBadge" class="px-4 py-2 rounded-2xl text-base sm:text-lg font-black text-white shadow-md flex items-center gap-2 bg-indigo-600">
+                        <i id="qCategoryIcon" class="fa-solid fa-music"></i>
+                        <span id="qCategoryName">Categoría</span>
+                    </span>
+                    <span id="qProgressBadge" class="text-lg sm:text-2xl font-black text-slate-800 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-300">
+                        Pregunta 1 / 20
+                    </span>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <button onclick="prevQuestion()" id="prevBtn" class="px-3.5 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-extrabold flex items-center gap-1.5 transition active:scale-95 text-sm sm:text-base">
+                        <i class="fa-solid fa-chevron-left"></i>
+                        <span>Anterior</span>
+                    </button>
+                    <button onclick="nextQuestion()" id="skipBtn" class="px-3.5 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-extrabold flex items-center gap-1.5 transition active:scale-95 text-sm sm:text-base">
+                        <span>Saltar</span>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quick Team +10 Points Award Bar for Active Round -->
+            <div class="bg-indigo-50/90 rounded-2xl p-2.5 border-2 border-indigo-200">
+                <div class="text-xs font-black text-indigo-950 uppercase tracking-wider mb-1.5 text-center sm:text-left flex items-center gap-2 justify-center sm:justify-start">
+                    <i class="fa-solid fa-bolt text-amber-500"></i>
+                    <span>Asignar +10 Puntos al equipo acertante:</span>
+                </div>
+                <div class="grid grid-cols-3 sm:grid-cols-6 gap-2" id="quickTeamButtons">
+                    <!-- Dynamic Team +10 Buttons -->
+                </div>
+            </div>
+
+            <!-- Question Text Box -->
+            <div class="bg-gradient-to-r from-indigo-900 to-purple-900 text-white p-5 sm:p-7 rounded-3xl shadow-lg border-4 border-indigo-400/30">
+                <h3 id="qText" class="text-2xl sm:text-3xl md:text-4xl font-extrabold leading-tight text-center md:text-left">
+                    ¿Pregunta?
+                </h3>
+            </div>
+
+            <!-- Timer Box Container -->
+            <div class="w-full">
+                <!-- 3s Prep Banner -->
+                <div id="prepBanner" class="bg-amber-100 border-4 border-amber-400 text-amber-950 rounded-2xl p-3.5 text-center text-xl sm:text-2xl md:text-3xl font-black shadow-md animate-ring-pulse flex items-center justify-center gap-3">
+                    <i class="fa-solid fa-stopwatch text-amber-600 text-2xl sm:text-3xl"></i>
+                    <span>⏱️ ¡Preparados! El tiempo empieza en <span id="prepSecsText" class="text-3xl sm:text-4xl font-black text-rose-600">3</span>...</span>
+                </div>
+
+                <!-- 10s Active Countdown Bar -->
+                <div id="activeTimerContainer" class="hidden flex-col gap-2">
+                    <div class="flex items-center justify-between text-base sm:text-lg font-black text-slate-700">
+                        <span class="flex items-center gap-2">
+                            <i class="fa-solid fa-hourglass-half text-indigo-600"></i>
+                            <span>Tiempo Restante:</span>
+                        </span>
+                        <span id="activeTimerText" class="text-2xl sm:text-3xl font-black text-indigo-700">10s</span>
+                    </div>
+                    <div class="w-full bg-slate-200 rounded-full h-5 sm:h-6 overflow-hidden border-2 border-slate-300 p-0.5 shadow-inner">
+                        <div id="timerProgressBar" class="h-full bg-emerald-500 rounded-full transition-all duration-100 ease-linear w-full"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Options Grid (A, B, C, D) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5" id="optionsContainer">
+                <!-- Dynamically Injected -->
+            </div>
+
+            <!-- Automatic 2-Second Transition Alert Banner -->
+            <div id="autoTransitionBanner" class="hidden bg-indigo-600 text-white p-3.5 rounded-2xl text-center text-lg sm:text-xl font-black shadow-xl animate-pulse flex items-center justify-center gap-3">
+                <i class="fa-solid fa-rotate-right animate-spin"></i>
+                <span>Pasando a la siguiente pregunta en 2 segundos...</span>
+            </div>
+
+            <!-- Explanation Panel -->
+            <div id="explanationContainer" class="hidden bg-amber-50 border-4 border-amber-300 rounded-2xl p-4 sm:p-5 shadow-md">
+                <div class="flex items-start gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-amber-400 text-amber-950 flex items-center justify-center font-black text-xl flex-shrink-0 mt-0.5 shadow">
+                        <i class="fa-solid fa-lightbulb"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-base sm:text-lg font-black text-amber-950 mb-1">Explicación Didáctica:</h4>
+                        <p id="explanationText" class="text-base sm:text-xl font-bold text-slate-800 leading-relaxed">
+                            Explicación del concepto...
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Question Controls -->
+            <div class="flex items-center justify-between gap-3 border-t-2 border-slate-200 pt-3">
+                <button onclick="restartCurrentTimer()" class="px-4 py-2.5 rounded-xl bg-indigo-100 hover:bg-indigo-200 text-indigo-900 border-2 border-indigo-300 font-extrabold text-sm sm:text-base transition active:scale-95 flex items-center gap-2">
+                    <i class="fa-solid fa-rotate text-indigo-700"></i>
+                    <span>Reiniciar Reloj</span>
+                </button>
+
+                <button onclick="forceNextQuestion()" class="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-base sm:text-lg border-b-4 border-indigo-900 shadow-md transition active:scale-95 flex items-center gap-2">
+                    <span>Siguiente Ahora</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- PODIUM / FINAL LEADERBOARD MODAL -->
+    <div id="podiumModal" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md hidden items-center justify-center p-4 overflow-y-auto">
+        <div class="glass-card bg-white rounded-3xl max-w-3xl w-full p-6 sm:p-8 shadow-2xl border-4 border-amber-400 my-auto flex flex-col gap-6 text-center">
+            
+            <div class="flex justify-between items-center border-b border-slate-200 pb-4">
+                <h3 class="text-3xl sm:text-4xl font-black text-slate-900 flex items-center gap-3 mx-auto">
+                    <i class="fa-solid fa-trophy text-amber-500 text-4xl"></i>
+                    <span>¡Gran Final! Podio de Equipos</span>
+                </h3>
+            </div>
+
+            <!-- Graphical Podium Visual (1st, 2nd, 3rd) -->
+            <div class="flex justify-center items-end gap-3 sm:gap-6 my-2 h-60 px-4">
+                
+                <!-- 2nd Place -->
+                <div class="flex flex-col items-center flex-1 max-w-[130px]">
+                    <span id="p2Name" class="font-extrabold text-sm sm:text-base text-slate-800 mb-1 truncate w-full text-center">Equipo 2</span>
+                    <span id="p2Score" class="font-black text-lg text-indigo-700 mb-2">0 pts</span>
+                    <div class="w-full bg-slate-300 rounded-t-2xl border-2 border-slate-400 flex flex-col items-center justify-center py-4 shadow-md h-36">
+                        <span class="text-3xl sm:text-4xl mb-1">🥈</span>
+                        <span class="font-black text-slate-700 text-xl sm:text-2xl">2.º</span>
+                    </div>
+                </div>
+
+                <!-- 1st Place -->
+                <div class="flex flex-col items-center flex-1 max-w-[150px]">
+                    <div class="text-amber-500 animate-bounce mb-1">
+                        <i class="fa-solid fa-crown text-3xl sm:text-4xl"></i>
+                    </div>
+                    <span id="p1Name" class="font-black text-base sm:text-lg text-amber-950 mb-1 truncate w-full text-center">Equipo 1</span>
+                    <span id="p1Score" class="font-black text-xl text-amber-600 mb-2">0 pts</span>
+                    <div class="w-full bg-gradient-to-t from-amber-400 to-amber-300 rounded-t-2xl border-4 border-amber-500 flex flex-col items-center justify-center py-6 shadow-xl h-48">
+                        <span class="text-4xl sm:text-5xl mb-1">🥇</span>
+                        <span class="font-black text-amber-950 text-2xl sm:text-3xl">1.º</span>
+                    </div>
+                </div>
+
+                <!-- 3rd Place -->
+                <div class="flex flex-col items-center flex-1 max-w-[130px]">
+                    <span id="p3Name" class="font-extrabold text-sm sm:text-base text-slate-800 mb-1 truncate w-full text-center">Equipo 3</span>
+                    <span id="p3Score" class="font-black text-lg text-amber-800 mb-2">0 pts</span>
+                    <div class="w-full bg-amber-700/20 rounded-t-2xl border-2 border-amber-700/40 flex flex-col items-center justify-center py-3 shadow-md h-28">
+                        <span class="text-2xl sm:text-3xl mb-1">🥉</span>
+                        <span class="font-black text-amber-900 text-lg sm:text-xl">3.º</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Positions 4, 5, 6 List -->
+            <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 text-left">
+                <h4 class="font-black text-slate-600 text-xs sm:text-sm uppercase tracking-wider mb-2">Clasificación General:</h4>
+                <div class="space-y-1.5" id="restPositionsList">
+                    <!-- Injected via JS -->
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
+                <button onclick="triggerConfetti()" class="w-full sm:w-auto px-6 py-3 rounded-2xl bg-amber-400 hover:bg-amber-500 text-amber-950 font-black text-lg border-b-4 border-amber-600 shadow-md transition active:scale-95 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-sparkles"></i>
+                    <span>¡Lanzar Confeti!</span>
+                </button>
+                
+                <button onclick="resetGame()" class="w-full sm:w-auto px-8 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-lg border-b-4 border-indigo-900 shadow-md transition active:scale-95">
+                    🔂 Nueva Partida
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATIONS -->
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- JAVASCRIPT APPLICATION LOGIC -->
+    <script>
+        /* ==========================================================================
+           1. 20 OFFICIAL QUESTIONS & CATEGORY STYLES
+           ========================================================================== */
+        const RAW_QUESTIONS = [
+            {
+                id: 1,
+                category: "Edad Media",
+                question: "1. ¿Cómo se cantaba el canto gregoriano en la Edad Media?",
+                options: [
+                    { text: "Acompañado por una orquesta completa.", correct: false },
+                    { text: "A capella y con una sola línea melódica.", correct: true },
+                    { text: "Con varias melodías independientes sonando a la vez.", correct: false },
+                    { text: "Con acompañamiento de violín y piano.", correct: false }
+                ],
+                explanation: "El canto gregoriano es monódico (una única línea melódica) y se cantaba a capella (sin instrumentos) en el ámbito religioso medieval."
+            },
+            {
+                id: 2,
+                category: "Edad Media",
+                question: "2. ¿Qué diferencia principal había entre los trovadores y los juglares?",
+                options: [
+                    { text: "Los trovadores pertenecían a la nobleza y los juglares eran artistas del pueblo.", correct: true },
+                    { text: "Los juglares cantaban en latín y los trovadores en castellano.", correct: false },
+                    { text: "Los trovadores solo tocaban el órgano en las iglesias.", correct: false },
+                    { text: "Los juglares eran nobles que componían exclusivamente para los reyes.", correct: false }
+                ],
+                explanation: "Los trovadores eran compositores nobles y cultos; los juglares eran cómicos, músicos y acróbatas populares itinerantes."
+            },
+            {
+                id: 3,
+                category: "Edad Media",
+                question: "3. ¿Cuál fue la aportación principal del monje Guido D'Arezzo a la música?",
+                options: [
+                    { text: "Inventar la guitarra moderna y el piano.", correct: false },
+                    { text: "Componer las primeras óperas de la historia.", correct: false },
+                    { text: "Crear el primer sistema de notación musical moderno.", correct: true },
+                    { text: "Organizar la orquesta en cuatro secciones fijas.", correct: false }
+                ],
+                explanation: "Guido D'Arezzo introdujo el tetragrama y dio nombre a las notas musicales, permitiendo escribir y leer la música."
+            },
+            {
+                id: 4,
+                category: "Edad Media",
+                question: "4. ¿De dónde procede el nombre original de las notas musicales (Ut, Re, Mi...)?",
+                options: [
+                    { text: "De un poema épico sobre caballeros medievales.", correct: false },
+                    { text: "De un antiguo libro de oraciones en griego.", correct: false },
+                    { text: "De los nombres de las notas de la flauta de pico.", correct: false },
+                    { text: "Del Himno a San Juan Bautista.", correct: true }
+                ],
+                explanation: "D'Arezzo tomó la primera sílaba de cada verso del 'Himno a San Juan Bautista' (Ut queant laxis, Resonare fibris, Mira gestorum...)."
+            },
+            {
+                id: 5,
+                category: "Renacimiento",
+                question: "5. ¿Qué invento facilitó la difusión de las partituras por Europa en el Renacimiento?",
+                options: [
+                    { text: "La imprenta.", correct: true },
+                    { text: "El clavecín.", correct: false },
+                    { text: "El gramófono.", correct: false },
+                    { text: "El pergamino ilustrado.", correct: false }
+                ],
+                explanation: "La invención de la imprenta musical multiplicó las copias de partituras, difundiendo la música culta por toda Europa."
+            },
+            {
+                id: 6,
+                category: "Renacimiento",
+                question: "6. ¿En qué consiste la polifonía desarrollada durante el Renacimiento?",
+                options: [
+                    { text: "Una sola voz que canta sin ningún instrumento.", correct: false },
+                    { text: "Un solista que canta mientras el resto guarda silencio.", correct: false },
+                    { text: "Mucha gente cantando exactamente la misma nota a la vez.", correct: false },
+                    { text: "Varias voces independientes que suenan a la vez de forma armónica.", correct: true }
+                ],
+                explanation: "La polifonía renacentista entrelaza varias melodías independientes que se combinan armónicamente en un tejido sonoro rico."
+            },
+            {
+                id: 7,
+                category: "Renacimiento",
+                question: "7. ¿Qué instrumento del Renacimiento es considerado el antecesor de la guitarra?",
+                options: [
+                    { text: "El laúd de pico.", correct: false },
+                    { text: "El clavecín.", correct: false },
+                    { text: "La vihuela.", correct: true },
+                    { text: "El violín.", correct: false }
+                ],
+                explanation: "La vihuela es un instrumento de cuerda pulsada con forma acorazonada, muy popular en la península ibérica durante el Renacimiento."
+            },
+            {
+                id: 8,
+                category: "Barroco",
+                question: "8. ¿Qué rasgo caracteriza principalmente a la música del periodo Barroco?",
+                options: [
+                    { text: "Sencillez extrema y melodías sin adorno alguno.", correct: false },
+                    { text: "Gran contraste entre partes y una decoración rica en adornos.", correct: true },
+                    { text: "Ausencia total de instrumentos de cuerda.", correct: false },
+                    { text: "Melodías muy lentas sin cambios de ritmo ni de volumen.", correct: false }
+                ],
+                explanation: "El Barroco se define por sus fuertes contrastes (fuerte/suave, rápido/lento), virtuosismo y una rica decoración melódica."
+            },
+            {
+                id: 9,
+                category: "Barroco",
+                question: "9. ¿En qué país nació la ópera durante el periodo Barroco?",
+                options: [
+                    { text: "Francia.", correct: false },
+                    { text: "España.", correct: false },
+                    { text: "Italia.", correct: true },
+                    { text: "Alemania.", correct: false }
+                ],
+                explanation: "La ópera nació en Florencia (Italia) a comienzos del siglo XVII combinando teatro, música, canto y escenografía."
+            },
+            {
+                id: 10,
+                category: "Barroco",
+                question: "10. ¿Cuáles fueron dos instrumentos clave en la época dorada del Barroco?",
+                options: [
+                    { text: "El violín y el clavecín.", correct: true },
+                    { text: "El piano y la guitarra eléctrica.", correct: false },
+                    { text: "La flauta de pico y la vihuela.", correct: false },
+                    { text: "El órgano y el sintetizador.", correct: false }
+                ],
+                explanation: "El violín (perfeccionado por los luthiers italianos) y el clavecín (que sostenía el bajo continuo) fueron la columna vertebral del Barroco."
+            },
+            {
+                id: 11,
+                category: "Clasicismo",
+                question: "11. ¿Qué buscaban principalmente los compositores del Clasicismo?",
+                options: [
+                    { text: "Exageración, desorden y fuertes contrastes.", correct: false },
+                    { text: "Sonidos oscuros, misteriosos y sin reglas.", correct: false },
+                    { text: "Expresar pasiones extremas sin importar la forma.", correct: false },
+                    { text: "Equilibrio, claridad, sencillez y elegancia.", correct: true }
+                ],
+                explanation: "El Clasicismo (siglo XVIII) buscaba el orden natural, la claridad melódica, el equilibrio de proporciones y la elegancia refinada."
+            },
+            {
+                id: 12,
+                category: "Clasicismo",
+                question: "12. ¿Qué instrumento nace en el Clasicismo y cobra un protagonismo clave?",
+                options: [
+                    { text: "El clavecín.", correct: false },
+                    { text: "La vihuela.", correct: false },
+                    { text: "El piano.", correct: true },
+                    { text: "El laúd.", correct: false }
+                ],
+                explanation: "El pianoforte (piano) superó al clavecín porque sus martillos permitían hacer dinámicas (tocar suave 'piano' o fuerte 'forte')."
+            },
+            {
+                id: 13,
+                category: "Clasicismo",
+                question: "13. ¿Qué es una sinfonía dentro de las formas musicales clásicas?",
+                options: [
+                    { text: "Una obra compuesta para ser interpretada por toda la orquesta.", correct: true },
+                    { text: "Una pieza musical corta para uno o dos instrumentos.", correct: false },
+                    { text: "Una canción cantada a capella por un coro.", correct: false },
+                    { text: "Un baile tradicional interpretado en los palacios.", correct: false }
+                ],
+                explanation: "La sinfonía es una gran composición instrumental estructurada en varios movimientos pensada para la orquesta completa."
+            },
+            {
+                id: 14,
+                category: "Romanticismo",
+                question: "14. ¿Cuál era la prioridad absoluta de los músicos en el Romanticismo?",
+                options: [
+                    { text: "Seguir estrictamente las reglas formales del pasado.", correct: false },
+                    { text: "Expresar emociones profundas, pasiones y sentimientos.", correct: true },
+                    { text: "Componer únicamente música para la Iglesia.", correct: false },
+                    { text: "Crear piezas cortas sin adornos ni expresividad.", correct: false }
+                ],
+                explanation: "El Romanticismo coloca la emoción desbordante, el subjetivismo y los sentimientos del compositor por encima de las reglas estrictas."
+            },
+            {
+                id: 15,
+                category: "Romanticismo",
+                question: "15. ¿Qué fenómeno cobró gran importancia en el Romanticismo gracias a solistas de enorme técnica?",
+                options: [
+                    { text: "La monofonía.", correct: false },
+                    { text: "El atonalismo.", correct: false },
+                    { text: "El minimalismo.", correct: false },
+                    { text: "El virtuosismo.", correct: true }
+                ],
+                explanation: "El virtuosismo encumbró a figuras como Liszt y Paganini, capaces de ejecutar pasajes de increíble dificultad técnica que deslumbraban al público."
+            },
+            {
+                id: 16,
+                category: "Nacionalismos",
+                question: "16. ¿Qué buscaban los compositores con el movimiento de los Nacionalismos?",
+                options: [
+                    { text: "Reafirmar la identidad cultural de su país usando el folclore.", correct: true },
+                    { text: "Copiar exactamente el estilo musical de otros países.", correct: false },
+                    { text: "Eliminar las melodías tradicionales de la música culta.", correct: false },
+                    { text: "Prohibir el uso de instrumentos de percusión.", correct: false }
+                ],
+                explanation: "Los compositores nacionalistas integraron leyendas, danzas y melodías folclóricas populares para ensalzar la identidad propia de sus naciones."
+            },
+            {
+                id: 17,
+                category: "Nacionalismos",
+                question: "17. ¿En qué se inspiraron compositores españoles como Manuel de Falla para sus obras?",
+                options: [
+                    { text: "En los cantos gregorianos medievales.", correct: false },
+                    { text: "En las bandas sonoras del cine italiano.", correct: false },
+                    { text: "En el folclore andaluz y el flamenco.", correct: true },
+                    { text: "En la ópera barroca alemana.", correct: false }
+                ],
+                explanation: "Manuel de Falla capturó la esencia del cante jondo y las ritmos flamencos andaluces en obras maestras orquestales como 'El amor brujo'."
+            },
+            {
+                id: 18,
+                category: "Siglo XX / Vanguardias",
+                question: "18. ¿Qué compositor creó la famosa obra modernista \"La consagración de la primavera\"?",
+                options: [
+                    { text: "Claude Debussy.", correct: false },
+                    { text: "Igor Stravinsky.", correct: true },
+                    { text: "Frédéric Chopin.", correct: false },
+                    { text: "Wolfgang Amadeus Mozart.", correct: false }
+                ],
+                explanation: "Stravinsky revolucionó la música del siglo XX con los ritmos salvajes, disonancias e innovaciones de 'La consagración de la primavera'."
+            },
+            {
+                id: 19,
+                category: "Siglo XX / Vanguardias",
+                question: "19. ¿Qué caracteriza a la música concreta dentro de la época contemporánea?",
+                options: [
+                    { text: "El uso exclusivo de instrumentos de viento-madera.", correct: false },
+                    { text: "Cantar composiciones en latín sin instrumentos.", correct: false },
+                    { text: "Tocar obras clásicas únicamente con piano.", correct: false },
+                    { text: "El uso de grabaciones de sonidos del entorno real.", correct: true }
+                ],
+                explanation: "La música concreta utiliza grabaciones de ruidos reales de la vida cotidiana (motores, agua, pisadas) procesados para crear música."
+            },
+            {
+                id: 20,
+                category: "Siglo XX / Vanguardias",
+                question: "20. ¿En qué consiste la música aleatoria contemporánea?",
+                options: [
+                    { text: "En repetir una misma nota durante toda la obra.", correct: false },
+                    { text: "En copiar partituras de la Edad Media.", correct: false },
+                    { text: "En usar el azar como elemento para componer o interpretar.", correct: true },
+                    { text: "En tocar sin seguir ningún ritmo ni compás.", correct: false }
+                ],
+                explanation: "La música aleatoria introduce el azar (dados, elección libre del intérprete) en la composición o en la ejecución de la obra."
+            }
+        ];
+
+        const CATEGORY_STYLES = {
+            'Edad Media': { bg: 'bg-purple-100', border: 'border-purple-300', text: 'text-purple-900', badgeBg: 'bg-purple-600', icon: 'fa-monument' },
+            'Renacimiento': { bg: 'bg-sky-100', border: 'border-sky-300', text: 'text-sky-900', badgeBg: 'bg-sky-600', icon: 'fa-palette' },
+            'Barroco': { bg: 'bg-amber-100', border: 'border-amber-300', text: 'text-amber-900', badgeBg: 'bg-amber-600', icon: 'fa-crown' },
+            'Clasicismo': { bg: 'bg-emerald-100', border: 'border-emerald-300', text: 'text-emerald-900', badgeBg: 'bg-emerald-600', icon: 'fa-masks-theater' },
+            'Romanticismo': { bg: 'bg-rose-100', border: 'border-rose-300', text: 'text-rose-900', badgeBg: 'bg-rose-600', icon: 'fa-heart' },
+            'Nacionalismos': { bg: 'bg-orange-100', border: 'border-orange-300', text: 'text-orange-900', badgeBg: 'bg-orange-600', icon: 'fa-flag' },
+            'Siglo XX / Vanguardias': { bg: 'bg-teal-100', border: 'border-teal-300', text: 'text-teal-900', badgeBg: 'bg-teal-600', icon: 'fa-compact-disc' }
+        };
+
+        const TEAM_COLORS = [
+            { bg: 'bg-rose-50', border: 'border-rose-300', text: 'text-rose-900', badgeBg: 'bg-rose-500' },
+            { bg: 'bg-indigo-50', border: 'border-indigo-300', text: 'text-indigo-900', badgeBg: 'bg-indigo-500' },
+            { bg: 'bg-emerald-50', border: 'border-emerald-300', text: 'text-emerald-900', badgeBg: 'bg-emerald-500' },
+            { bg: 'bg-amber-50', border: 'border-amber-300', text: 'text-amber-900', badgeBg: 'bg-amber-500' },
+            { bg: 'bg-purple-50', border: 'border-purple-300', text: 'text-purple-900', badgeBg: 'bg-purple-500' },
+            { bg: 'bg-cyan-50', border: 'border-cyan-300', text: 'text-cyan-900', badgeBg: 'bg-cyan-500' }
+        ];
+
+        /* ==========================================================================
+           2. WEB AUDIO API SYNTHESIZER
+           ========================================================================== */
+        let audioCtx = null;
+        let isAudioMuted = false;
+
+        function getAudioContext() {
+            if (!audioCtx) {
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContextClass();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            return audioCtx;
+        }
+
+        function toggleAudio() {
+            isAudioMuted = !isAudioMuted;
+            const icon = document.getElementById('audioIcon');
+            const text = document.getElementById('audioText');
+            if (isAudioMuted) {
+                icon.className = 'fa-solid fa-volume-xmark text-rose-500';
+                text.textContent = 'Sonido: OFF';
+                showToast("🔊 Sonido desactivado", "warning");
+            } else {
+                icon.className = 'fa-solid fa-volume-high text-indigo-600';
+                text.textContent = 'Sonido: ON';
+                showToast("🔊 Sonido activado", "info");
+                playClickSound();
+            }
+        }
+
+        function playClickSound() {
+            if (isAudioMuted) return;
+            try {
+                const ctx = getAudioContext();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(750, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(350, ctx.currentTime + 0.04);
+                gain.gain.setValueAtTime(0.12, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.04);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.04);
+            } catch (e) {}
+        }
+
+        function playPrepBeepSound() {
+            if (isAudioMuted) return;
+            try {
+                const ctx = getAudioContext();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(523.25, ctx.currentTime);
+                gain.gain.setValueAtTime(0.2, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.15);
+            } catch (e) {}
+        }
+
+        function playTickSound() {
+            if (isAudioMuted) return;
+            try {
+                const ctx = getAudioContext();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880, ctx.currentTime);
+                gain.gain.setValueAtTime(0.25, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.08);
+            } catch (e) {}
+        }
+
+        function playTimeUpSound() {
+            if (isAudioMuted) return;
+            try {
+                const ctx = getAudioContext();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(320, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(110, ctx.currentTime + 0.45);
+                gain.gain.setValueAtTime(0.3, ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, ctx.currentTime + 0.45);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.45);
+            } catch (e) {}
+        }
+
+        function playCorrectSound() {
+            if (isAudioMuted) return;
+            try {
+                const ctx = getAudioContext();
+                const notes = [523.25, 659.25, 783.99, 1046.50];
+                notes.forEach((freq, idx) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    const startTime = ctx.currentTime + idx * 0.07;
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, startTime);
+                    gain.gain.setValueAtTime(0.25, startTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.25);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(startTime);
+                    osc.stop(startTime + 0.25);
+                });
+            } catch (e) {}
+        }
+
+        function playWrongSound() {
+            if (isAudioMuted) return;
+            try {
+                const ctx = getAudioContext();
+                const osc1 = ctx.createOscillator();
+                const osc2 = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc1.type = 'sawtooth';
+                osc2.type = 'sawtooth';
+                osc1.frequency.setValueAtTime(160, ctx.currentTime);
+                osc2.frequency.setValueAtTime(151, ctx.currentTime);
+                gain.gain.setValueAtTime(0.28, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.35);
+                osc1.connect(gain);
+                osc2.connect(gain);
+                gain.connect(ctx.destination);
+                osc1.start();
+                osc2.start();
+                osc1.stop(ctx.currentTime + 0.35);
+                osc2.stop(ctx.currentTime + 0.35);
+            } catch (e) {}
+        }
+
+        function playPointSound() {
+            if (isAudioMuted) return;
+            try {
+                const ctx = getAudioContext();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(987.77, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1318.51, ctx.currentTime + 0.12);
+                gain.gain.setValueAtTime(0.2, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.15);
+            } catch (e) {}
+        }
+
+        function playFanfareSound() {
+            if (isAudioMuted) return;
+            try {
+                const ctx = getAudioContext();
+                const notes = [
+                    { f: 523.25, d: 0.15, t: 0 },
+                    { f: 523.25, d: 0.15, t: 0.15 },
+                    { f: 523.25, d: 0.15, t: 0.30 },
+                    { f: 659.25, d: 0.4,  t: 0.45 },
+                    { f: 783.99, d: 0.2,  t: 0.90 },
+                    { f: 1046.50,d: 0.6,  t: 1.10 }
+                ];
+                notes.forEach(note => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    const startTime = ctx.currentTime + note.t;
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(note.f, startTime);
+                    gain.gain.setValueAtTime(0.3, startTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, startTime + note.d);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(startTime);
+                    osc.stop(startTime + note.d);
+                });
+            } catch (e) {}
+        }
+
+        /* ==========================================================================
+           3. GAME STATE MANAGEMENT & FISHER-YATES SHUFFLE
+           ========================================================================== */
+        let gameQuestions = [];
+        let currentQuestionIndex = 0;
+        let teamNames = ['Equipo 1', 'Equipo 2', 'Equipo 3', 'Equipo 4', 'Equipo 5', 'Equipo 6'];
+        let teamScores = [0, 0, 0, 0, 0, 0];
+
+        // Timers & State
+        let prepTimerInterval = null;
+        let activeTimerInterval = null;
+        let autoTransitionTimeout = null;
+        let isAnswered = false;
+        let isPaused = false;
+        let remainingTimerMs = 10000;
+        let activeTimerStartTime = 0;
+
+        function shuffleArray(arr) {
+            const array = [...arr];
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function initGame() {
+            // Prepare 20 questions with Fisher-Yates shuffled options
+            gameQuestions = RAW_QUESTIONS.map(q => ({
+                ...q,
+                shuffledOptions: shuffleArray(q.options)
+            }));
+
+            teamScores = [0, 0, 0, 0, 0, 0];
+            currentQuestionIndex = 0;
+
+            renderScoreboard();
+            renderQuickTeamButtons();
+            
+            // LOAD QUESTION 1 IMMEDIATELY WITH NO INITIAL START SCREEN
+            loadQuestion(0);
+        }
+
+        function resetGame() {
+            playClickSound();
+            closePodiumModal();
+            initGame();
+            showToast("🔄 Nueva partida iniciada", "info");
+        }
+
+        /* ==========================================================================
+           4. SCOREBOARD & TEAM MANAGEMENT
+           ========================================================================== */
+        function renderScoreboard() {
+            const container = document.getElementById('scoreboardGrid');
+            container.innerHTML = '';
+
+            teamNames.forEach((name, idx) => {
+                const theme = TEAM_COLORS[idx % TEAM_COLORS.length];
+                const card = document.createElement('div');
+                card.className = `${theme.bg} ${theme.border} border-2 rounded-2xl p-2.5 flex flex-col justify-between shadow-sm`;
+                card.innerHTML = `
+                    <div class="flex items-center gap-1 mb-1">
+                        <span class="w-5 h-5 rounded-md ${theme.badgeBg} text-white font-black text-xs flex items-center justify-center flex-shrink-0">
+                            E${idx + 1}
+                        </span>
+                        <input type="text" value="${name}" onchange="updateTeamName(${idx}, this.value)" 
+                            class="font-black text-sm sm:text-base ${theme.text} bg-transparent border-b border-dashed border-slate-400 focus:border-indigo-600 focus:outline-none w-full truncate" 
+                            title="Haz clic para editar nombre" />
+                    </div>
+                    
+                    <div class="text-center my-0.5">
+                        <span id="scoreTeam-${idx}" class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+                            ${teamScores[idx]}
+                        </span>
+                        <span class="text-[10px] font-bold text-slate-500 block">puntos</span>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-1 mt-1">
+                        <button onclick="modifyScore(${idx}, 10)" class="py-1 px-1 bg-emerald-500 hover:bg-emerald-600 text-white font-black rounded-lg text-xs shadow active:scale-95 transition" title="Sumar 10 pts">
+                            +10
+                        </button>
+                        <button onclick="modifyScore(${idx}, 5)" class="py-1 px-1 bg-indigo-500 hover:bg-indigo-600 text-white font-black rounded-lg text-xs shadow active:scale-95 transition" title="Sumar 5 pts">
+                            +5
+                        </button>
+                        <button onclick="modifyScore(${idx}, -5)" class="py-1 px-1 bg-rose-500 hover:bg-rose-600 text-white font-black rounded-lg text-xs shadow active:scale-95 transition" title="Restar 5 pts">
+                            -5
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function updateTeamName(index, newName) {
+            if (newName.trim() !== "") {
+                teamNames[index] = newName.trim();
+                renderQuickTeamButtons();
+                showToast(`Nombre guardado: ${teamNames[index]}`, "info");
+            }
+        }
+
+        function modifyScore(index, delta) {
+            teamScores[index] += delta;
+            if (teamScores[index] < 0) teamScores[index] = 0;
+            
+            const scoreElem = document.getElementById(`scoreTeam-${index}`);
+            if (scoreElem) scoreElem.textContent = teamScores[index];
+            
+            if (delta > 0) playPointSound();
+            showToast(`${delta > 0 ? '+' : ''}${delta} pts para ${teamNames[index]}`, delta > 0 ? "success" : "warning");
+        }
+
+        function renderQuickTeamButtons() {
+            const container = document.getElementById('quickTeamButtons');
+            if (!container) return;
+            container.innerHTML = '';
+            
+            teamNames.forEach((name, idx) => {
+                const theme = TEAM_COLORS[idx % TEAM_COLORS.length];
+                const btn = document.createElement('button');
+                btn.onclick = () => modifyScore(idx, 10);
+                btn.className = `${theme.badgeBg} hover:opacity-90 text-white font-extrabold px-2 py-1.5 rounded-xl text-xs sm:text-sm shadow transition active:scale-95 flex items-center justify-center gap-1 truncate`;
+                btn.innerHTML = `<i class="fa-solid fa-plus text-xs"></i> <span class="truncate">E${idx+1}: +10</span>`;
+                container.appendChild(btn);
+            });
+        }
+
+        /* ==========================================================================
+           5. ACTIVE QUESTION DISPLAY & TIMERS
+           ========================================================================== */
+        function loadQuestion(index) {
+            clearAllTimers();
+            isAnswered = false;
+            isPaused = false;
+            currentQuestionIndex = index;
+            updatePauseButtonUI();
+
+            const q = gameQuestions[index];
+            const style = CATEGORY_STYLES[q.category] || CATEGORY_STYLES['Edad Media'];
+
+            // Header badges
+            const badge = document.getElementById('qCategoryBadge');
+            badge.className = `px-4 py-2 rounded-2xl text-base sm:text-lg font-black text-white shadow-md flex items-center gap-2 ${style.badgeBg}`;
+            document.getElementById('qCategoryIcon').className = `fa-solid ${style.icon}`;
+            document.getElementById('qCategoryName').textContent = q.category;
+            document.getElementById('qProgressBadge').textContent = `Pregunta ${index + 1} / ${gameQuestions.length}`;
+            document.getElementById('qText').textContent = q.question;
+
+            // Nav buttons state
+            document.getElementById('prevBtn').disabled = (index === 0);
+            document.getElementById('prevBtn').className = `px-3.5 py-2 rounded-xl text-slate-800 font-extrabold flex items-center gap-1.5 transition text-sm sm:text-base ${index === 0 ? 'bg-slate-200 opacity-50 cursor-not-allowed' : 'bg-slate-200 hover:bg-slate-300 active:scale-95'}`;
+
+            // Reset banners and explanation
+            document.getElementById('explanationContainer').classList.add('hidden');
+            document.getElementById('autoTransitionBanner').classList.add('hidden');
+            document.getElementById('explanationText').textContent = q.explanation;
+
+            // Render options (disabled during 3s prep)
+            renderOptions(q, true);
+
+            // START AUTOMATIC 3-SECOND PREP COUNTDOWN
+            startPrepTimer();
+        }
+
+        function renderOptions(questionObj, isDisabled) {
+            const container = document.getElementById('optionsContainer');
+            container.innerHTML = '';
+
+            const letters = ['A', 'B', 'C', 'D'];
+            questionObj.shuffledOptions.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.id = `optBtn-${idx}`;
+                btn.disabled = isDisabled;
+                
+                btn.className = `w-full text-left p-4 sm:p-5 md:p-6 rounded-2xl border-4 transition-all duration-200 flex items-center gap-4 ${
+                    isDisabled 
+                        ? 'bg-white/80 border-slate-200 opacity-75 cursor-not-allowed shadow-sm' 
+                        : 'bg-white border-slate-200 hover:border-indigo-500 hover:bg-indigo-50/60 shadow-md hover:shadow-xl cursor-pointer active:scale-[0.99]'
+                }`;
+
+                btn.onclick = () => selectAnswer(idx);
+
+                btn.innerHTML = `
+                    <span class="opt-letter w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-slate-100 text-slate-800 font-black text-xl sm:text-2xl flex items-center justify-center shadow-inner border border-slate-300 flex-shrink-0">
+                        ${letters[idx]}
+                    </span>
+                    <span class="opt-text text-lg sm:text-xl md:text-2xl font-extrabold text-slate-900 flex-1 leading-snug">
+                        ${opt.text}
+                    </span>
+                `;
+                container.appendChild(btn);
+            });
+        }
+
+        function startPrepTimer() {
+            clearAllTimers();
+            let prepSecs = 3;
+            const prepBanner = document.getElementById('prepBanner');
+            const activeContainer = document.getElementById('activeTimerContainer');
+            const prepSecsText = document.getElementById('prepSecsText');
+
+            prepBanner.classList.remove('hidden');
+            activeContainer.classList.add('hidden');
+            prepSecsText.textContent = prepSecs;
+
+            playPrepBeepSound();
+
+            prepTimerInterval = setInterval(() => {
+                if (isPaused) return;
+                
+                prepSecs--;
+                if (prepSecs > 0) {
+                    prepSecsText.textContent = prepSecs;
+                    playPrepBeepSound();
+                } else {
+                    clearInterval(prepTimerInterval);
+                    prepBanner.classList.add('hidden');
+                    activeContainer.classList.remove('hidden');
+                    activeContainer.classList.add('flex');
+                    
+                    enableOptions();
+                    startActiveTimer(10000);
+                }
+            }, 1000);
+        }
+
+        function enableOptions() {
+            const q = gameQuestions[currentQuestionIndex];
+            q.shuffledOptions.forEach((_, idx) => {
+                const btn = document.getElementById(`optBtn-${idx}`);
+                if (btn) {
+                    btn.disabled = false;
+                    btn.className = `w-full text-left p-4 sm:p-5 md:p-6 rounded-2xl border-4 bg-white border-slate-200 hover:border-indigo-500 hover:bg-indigo-50/60 shadow-md hover:shadow-xl cursor-pointer active:scale-[0.99] transition-all duration-200 flex items-center gap-4`;
+                }
+            });
+        }
+
+        function startActiveTimer(durationMs) {
+            remainingTimerMs = durationMs;
+            activeTimerStartTime = Date.now();
+            let lastTickSecond = Math.ceil(remainingTimerMs / 1000);
+
+            updateTimerBar(remainingTimerMs / 1000);
+
+            activeTimerInterval = setInterval(() => {
+                if (isPaused) return;
+
+                const elapsed = Date.now() - activeTimerStartTime;
+                remainingTimerMs = Math.max(0, durationMs - elapsed);
+                const remainingSecs = remainingTimerMs / 1000;
+                const currentIntSec = Math.ceil(remainingSecs);
+
+                updateTimerBar(remainingSecs);
+
+                // Audio tick sound at 3s, 2s, 1s
+                if (currentIntSec <= 3 && currentIntSec > 0 && currentIntSec !== lastTickSecond) {
+                    lastTickSecond = currentIntSec;
+                    playTickSound();
+                }
+
+                if (remainingTimerMs <= 0) {
+                    clearInterval(activeTimerInterval);
+                    handleTimeUp();
+                }
+            }, 50);
+        }
+
+        function updateTimerBar(remainingSecs) {
+            const bar = document.getElementById('timerProgressBar');
+            const text = document.getElementById('activeTimerText');
+            const pct = Math.max(0, (remainingSecs / 10) * 100);
+
+            bar.style.width = `${pct}%`;
+            text.textContent = `${Math.ceil(remainingSecs)}s`;
+
+            if (pct > 50) {
+                bar.className = 'h-full rounded-full transition-all duration-75 ease-linear bg-emerald-500';
+            } else if (pct > 25) {
+                bar.className = 'h-full rounded-full transition-all duration-75 ease-linear bg-amber-500';
+            } else {
+                bar.className = 'h-full rounded-full transition-all duration-75 ease-linear bg-rose-500';
+            }
+        }
+
+        function togglePauseTimer() {
+            isPaused = !isPaused;
+            updatePauseButtonUI();
+            if (isPaused) {
+                showToast("⏸️ Temporizador Pausado", "warning");
+            } else {
+                showToast("▶️ Temporizador Reanudado", "info");
+                activeTimerStartTime = Date.now() - (10000 - remainingTimerMs);
+            }
+        }
+
+        function updatePauseButtonUI() {
+            const icon = document.getElementById('pauseIcon');
+            const text = document.getElementById('pauseText');
+            if (isPaused) {
+                icon.className = 'fa-solid fa-play text-emerald-600';
+                text.textContent = 'Reanudar';
+            } else {
+                icon.className = 'fa-solid fa-pause text-indigo-700';
+                text.textContent = 'Pausar';
+            }
+        }
+
+        function restartCurrentTimer() {
+            playClickSound();
+            if (isAnswered) return;
+            startPrepTimer();
+            showToast("⏱️ Reloj reiniciado", "info");
+        }
+
+        function disableAllOptions() {
+            const q = gameQuestions[currentQuestionIndex];
+            q.shuffledOptions.forEach((_, idx) => {
+                const btn = document.getElementById(`optBtn-${idx}`);
+                if (btn) btn.disabled = true;
+            });
+        }
+
+        /* ==========================================================================
+           6. AUTOMATIC 2-SECOND QUESTION TRANSITION
+           ========================================================================== */
+        function selectAnswer(selectedIndex) {
+            if (isAnswered) return;
+            isAnswered = true;
+            clearAllTimers();
+            disableAllOptions();
+
+            const q = gameQuestions[currentQuestionIndex];
+            const isCorrect = q.shuffledOptions[selectedIndex].correct;
+
+            // Highlight options visually
+            q.shuffledOptions.forEach((opt, idx) => {
+                const btn = document.getElementById(`optBtn-${idx}`);
+                const letter = btn.querySelector('.opt-letter');
+
+                if (opt.correct) {
+                    btn.className = "w-full text-left p-4 sm:p-5 md:p-6 rounded-2xl border-4 border-emerald-500 bg-emerald-50 shadow-xl flex items-center gap-4 transform scale-[1.01]";
+                    letter.className = "w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-emerald-500 text-white font-black text-xl sm:text-2xl flex items-center justify-center shadow flex-shrink-0";
+                    letter.innerHTML = '<i class="fa-solid fa-check"></i>';
+                } else if (idx === selectedIndex && !isCorrect) {
+                    btn.className = "w-full text-left p-4 sm:p-5 md:p-6 rounded-2xl border-4 border-rose-500 bg-rose-50 shadow-lg flex items-center gap-4";
+                    letter.className = "w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-rose-500 text-white font-black text-xl sm:text-2xl flex items-center justify-center shadow flex-shrink-0";
+                    letter.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+                } else {
+                    btn.className = "w-full text-left p-4 sm:p-5 md:p-6 rounded-2xl border-4 border-slate-200 bg-slate-100 opacity-60 flex items-center gap-4";
+                }
+            });
+
+            // Show explanation
+            document.getElementById('explanationContainer').classList.remove('hidden');
+
+            if (isCorrect) {
+                playCorrectSound();
+                showToast("✨ ¡Respuesta Correcta!", "success");
+            } else {
+                playWrongSound();
+                showToast("❌ Respuesta Incorrecta", "error");
+            }
+
+            // Show 2-second automatic transition banner
+            document.getElementById('autoTransitionBanner').classList.remove('hidden');
+
+            // AUTOMATIC TRANSITION EXACTLY AFTER 2 SECONDS
+            autoTransitionTimeout = setTimeout(() => {
+                advanceToNextQuestionOrPodium();
+            }, 2000);
+        }
+
+        function handleTimeUp() {
+            if (isAnswered) return;
+            isAnswered = true;
+            disableAllOptions();
+            playTimeUpSound();
+
+            const q = gameQuestions[currentQuestionIndex];
+            q.shuffledOptions.forEach((opt, idx) => {
+                const btn = document.getElementById(`optBtn-${idx}`);
+                const letter = btn.querySelector('.opt-letter');
+                if (opt.correct) {
+                    btn.className = "w-full text-left p-4 sm:p-5 md:p-6 rounded-2xl border-4 border-emerald-500 bg-emerald-50 shadow-xl flex items-center gap-4 transform scale-[1.01]";
+                    letter.className = "w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-emerald-500 text-white font-black text-xl sm:text-2xl flex items-center justify-center shadow flex-shrink-0";
+                    letter.innerHTML = '<i class="fa-solid fa-check"></i>';
+                } else {
+                    btn.className = "w-full text-left p-4 sm:p-5 md:p-6 rounded-2xl border-4 border-slate-200 bg-slate-100 opacity-60 flex items-center gap-4";
+                }
+            });
+
+            document.getElementById('explanationContainer').classList.remove('hidden');
+            document.getElementById('autoTransitionBanner').classList.remove('hidden');
+            showToast("⏰ ¡Tiempo Agotado!", "warning");
+
+            // AUTOMATIC TRANSITION EXACTLY AFTER 2 SECONDS
+            autoTransitionTimeout = setTimeout(() => {
+                advanceToNextQuestionOrPodium();
+            }, 2000);
+        }
+
+        function advanceToNextQuestionOrPodium() {
+            if (currentQuestionIndex < gameQuestions.length - 1) {
+                loadQuestion(currentQuestionIndex + 1);
+            } else {
+                openPodiumModal();
+            }
+        }
+
+        function forceNextQuestion() {
+            playClickSound();
+            clearAllTimers();
+            advanceToNextQuestionOrPodium();
+        }
+
+        function nextQuestion() {
+            playClickSound();
+            clearAllTimers();
+            if (currentQuestionIndex < gameQuestions.length - 1) {
+                loadQuestion(currentQuestionIndex + 1);
+            } else {
+                openPodiumModal();
+            }
+        }
+
+        function prevQuestion() {
+            playClickSound();
+            clearAllTimers();
+            if (currentQuestionIndex > 0) {
+                loadQuestion(currentQuestionIndex - 1);
+            }
+        }
+
+        function clearAllTimers() {
+            if (prepTimerInterval) clearInterval(prepTimerInterval);
+            if (activeTimerInterval) clearInterval(activeTimerInterval);
+            if (autoTransitionTimeout) clearTimeout(autoTransitionTimeout);
+        }
+
+        /* ==========================================================================
+           7. PODIUM MODAL & CONFETTI
+           ========================================================================== */
+        function openPodiumModal() {
+            clearAllTimers();
+            playFanfareSound();
+            
+            const rankedTeams = teamNames.map((name, idx) => ({
+                name: name,
+                score: teamScores[idx],
+                origIndex: idx
+            })).sort((a, b) => b.score - a.score);
+
+            // 1st Place
+            document.getElementById('p1Name').textContent = rankedTeams[0].name;
+            document.getElementById('p1Score').textContent = `${rankedTeams[0].score} pts`;
+
+            // 2nd Place
+            document.getElementById('p2Name').textContent = rankedTeams[1].name;
+            document.getElementById('p2Score').textContent = `${rankedTeams[1].score} pts`;
+
+            // 3rd Place
+            document.getElementById('p3Name').textContent = rankedTeams[2].name;
+            document.getElementById('p3Score').textContent = `${rankedTeams[2].score} pts`;
+
+            // Positions 4, 5, 6
+            const listContainer = document.getElementById('restPositionsList');
+            listContainer.innerHTML = '';
+
+            for (let i = 3; i < rankedTeams.length; i++) {
+                const row = document.createElement('div');
+                row.className = 'flex items-center justify-between bg-white px-4 py-2 rounded-xl border border-slate-200 font-bold text-sm sm:text-base text-slate-700';
+                row.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <span class="w-6 h-6 rounded-full bg-slate-200 text-slate-700 text-xs font-black flex items-center justify-center">${i + 1}º</span>
+                        <span class="font-black text-slate-900">${rankedTeams[i].name}</span>
+                    </div>
+                    <span class="font-extrabold text-indigo-700">${rankedTeams[i].score} pts</span>
+                `;
+                listContainer.appendChild(row);
+            }
+
+            const modal = document.getElementById('podiumModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            triggerConfetti();
+        }
+
+        function closePodiumModal() {
+            playClickSound();
+            const modal = document.getElementById('podiumModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function triggerConfetti() {
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 150,
+                    spread: 100,
+                    origin: { y: 0.6 }
+                });
+            }
+        }
+
+        /* ==========================================================================
+           8. TOAST NOTIFICATIONS
+           ========================================================================== */
+        function showToast(message, type = "info") {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            
+            let bgStyle = "bg-slate-900 text-white";
+            if (type === "success") bgStyle = "bg-emerald-600 text-white shadow-emerald-200";
+            if (type === "error") bgStyle = "bg-rose-600 text-white shadow-rose-200";
+            if (type === "warning") bgStyle = "bg-amber-500 text-amber-950 shadow-amber-200";
+
+            toast.className = `px-4 py-2.5 rounded-2xl ${bgStyle} font-extrabold text-xs sm:text-sm shadow-xl border-2 border-white/20 flex items-center gap-2 transform transition-all duration-300 pointer-events-auto`;
+            toast.innerHTML = message;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 2300);
+        }
+
+        /* ==========================================================================
+           9. APP LAUNCH ON LOAD
+           ========================================================================== */
+        window.onload = function() {
+            initGame();
+        };
+    </script>
+</body>
+</html>
